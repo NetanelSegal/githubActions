@@ -5,7 +5,7 @@ const puppeteer = require('puppeteer');
     const page = await browser.newPage();
 
     // Define the URL with parameters
-    const url = window.location.href + 'web_page_code/index.html?num1=123&num2=123'; // Replace with your actual URL and parameters
+    const url = "https://check-smartscript-page.glitch.me/?num1=13&num2=13"; // Replace with your actual URL and parameters
 
     // Navigate to the web page with parameters
     await page.goto(url);
