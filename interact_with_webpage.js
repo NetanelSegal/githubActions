@@ -1,7 +1,25 @@
 const puppeteer = require('puppeteer');
+const fs = require('fs');
+const { getUrlsFromFile } = require("./utils/functions")
+
+// Specify the path to the HTML file
+const filePath = `${__dirname}/examples/facebook_clickid.html`;
+
+
+getUrlsFromFile(filePath);
 
 (async () => {
+    // לפתוח את הקובץ html
+    // לשלוף משם את הקוד שבתוך ה
+    // document.getElementById("input_code_for_run").value
     const browser = await puppeteer.launch({ headless: "new" });
+
+    // const currentHtmlPage = await browser.newPage();
+
+    // await currentHtmlPage.goto(`file://${__dirname}/examples/facebook_clickid.html`);
+
+
+
     const page = await browser.newPage();
 
     // Define the URL with parameters

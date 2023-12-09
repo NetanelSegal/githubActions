@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base herf="/">
+    <link rel="stylesheet" href="./style_test_page.css">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RJJXZ6Q5BJ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-RJJXZ6Q5BJ');
+    </script>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-container">
+        <img src="./images/AF_LOGO.svg" alt="logo" class="logo" />
+      </div>
+    </div>
+    <div class="container">
+      <h1 class="title"> Smart Script test page </h1>
+      <p class="sub-title">Test how your Smart Script uses an incoming URL to dynamically generate a unique outgoing URL.</p>
+      <section class="shadow-box">
+        <h4>Incoming URL</h4>
+        <label for="input_url">Enter your incoming URL</label>
+        <input id="input_url" onBlur="success()" onkeyup="success()" class="incoming" type="text" name="input_url" placeholder="For example: https://app.mypage.com/main.html?utm_source=mail&in_cmp=summersale">
+        <span id="error-msg">Value should contain a valid url</span>
+        <div class="top-wrapper">
+          <h4 class="ss-title">Smart Script</h4>
+          <Button onclick="clearInputs()" id="clear-btn" class="clear-btn">Clear</Button>
+        </div>
+        <pre>
+					<textarea onBlur="success()" onkeyup="success()" id="input_code_for_run"  class="ss-code" placeholder="Drag your generated file or paste the Smart Script code you created in the AppsFlyer dashboard."></textarea>
+				</pre>
+        <div id="error-code">Something went wrong. Check your Smart Script and try again</div>
+        <Button onclick="runTxtAreaCode()" id="run-code-btn" class="run-code-btn" disabled="true">Run code</Button>
+      </section>
+      <section class="shadow-box">
+        <div class="output_url-container">
+          <h4>Outgoing URL</h4>
+          <input id="output_url" placeholder="Enter and run your Smart Script code to generate an outgoing URL."></input>
+        </div>
+      </section>
+    </div>
+    <script type="text/javascript" src="https://onelinksmartscript.appsflyer.com/onelink-smart-script-latest.js"></script>
+    <script>
+	var queryString = window.location.search;
+	var urlParams = new URLSearchParams(queryString);
+	var encodedCode = urlParams.get('codeFromhq');
+	if(encodedCode){
+		document.getElementById('input_code_for_run').textContent = encodedCode;
+	}
+      function dropfile(file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          input_code_for_run.value = e.target.result;
+          success();
+        };
+        reader.readAsText(file, "UTF-8");
+      }
+
+      input_code_for_run.ondrop = function(e) {
+        e.preventDefault();
+        var file = e.dataTransfer.files[0];
+        dropfile(file);
+      };
+
+      // set the onClick to run the code in the code editor
+      function runTxtAreaCode() {
+        try {
+          // This code sets the preserved params in local storage. In a real scenario this is not needed, only here
+          const wb = document.getElementById("input_url").value;
+          const inUrl = new URL(wb);
+          const urlParams = new URLSearchParams(inUrl.search);
+          const queryParams = Array.from(urlParams).reduce(
+            (acc, [key, value]) => ({ ...acc, [key]: encodeURIComponent(value) }),
+            {}
+          );
+          const savedQueryParams = JSON.parse(localStorage.getItem('ss_incoming_params') || '[]');
+          const now = new Date().getTime();
+          const twoHoursLater = now + 2 * 60 * 60 * 1000; // Add 2 hours in milliseconds(product request)
+          const dataToSave = { ...queryParams, af_ss_exp_at: twoHoursLater };
+          savedQueryParams.unshift(dataToSave); // we used unshift becuse the order matter
+          localStorage.setItem('ss_incoming_params', JSON.stringify(savedQueryParams));
+          // End of preserving the incoming params
+          window.result = undefined;
+          window.AF_SMART_SCRIPT_RESULT = undefined;
+          document.getElementById("output_url").value = "";
+          const inputUrl = new URL(document.getElementById("input_url").value);
+          const inSearch = inputUrl.search
+          const url = new URL(window.location);
+          url.search = inSearch;
+          // url.searchParams.set(inSearch);
+          window.history.pushState({}, '', url);
+          var headID = document.getElementsByTagName("head")[0];
+          var newScript = document.createElement("script");
+          newScript.type = "text/javascript";
+          newScript.textContent = document.getElementById("input_code_for_run").value.replaceAll(/<\/?script>/ig, "");
+          headID.appendChild(newScript);
+          var result_url;
+          if (typeof AF_SMART_SCRIPT_RESULT !== "undefined") {
+            result_url = AF_SMART_SCRIPT_RESULT.clickURL;
+          } else if (typeof result !== "undefined") {
+            result_url = result.clickURL;
+          } else {
+            document.getElementById('error-code').style.display = 'block';
+            document.getElementById('input_code_for_run').style.borderColor = 'red';
+            // Send Google Analytics - Run Script No Result
+            gtag('event', 'RunScript', {
+              'event_category' : 'SmartScriptTestPage',
+              'event_label' : 'ErrorNoResult'
+            });
+          }
+          if (result_url) {
+            document.getElementById("output_url").value = result_url
+            // Send Google Analytics - Run Script Successful
+            gtag('event', 'RunScript', {
+              'event_category' : 'SmartScriptTestPage',
+              'event_label' : 'Success'
+            });
+          }
+          if (document.getElementById("input_url").value === "" || document.getElementById("input_code_for_run").value === "") {
+            document.getElementById('run-code-btn').disabled = true;
+          } else {
+            document.getElementById('run-code-btn').disabled = false;
+          }
+          if (document.getElementById("input_code_for_run").value === "") {
+            document.getElementById('clear-btn').disabled = true;
+          }
+
+        } catch (error) {
+          console.log("🚀 ~ file: index13.html ~ line 77 ~ runTxtAreaCode ~ error", error)
+          document.getElementById('error-code').style.display = 'block';
+          document.getElementById('input_code_for_run').style.borderColor = 'red';
+          
+          // Send Google Analytics - Run Script Error Bad Script
+          gtag('event', 'RunScript', {
+            'event_category' : 'SmartScriptTestPage',
+            'event_label' : 'ErrorBadScript'
+          });
+        }
+      };
+
+      function clearInputs() {
+        document.getElementById("input_code_for_run").value = ""
+        document.getElementById("output_url").value = ""
+        document.getElementById('clear-btn').disabled = true;
+        document.getElementById('run-code-btn').disabled = true;
+        document.getElementById('error-code').style.display = 'none';
+        document.getElementById('input_code_for_run').style.borderColor = '#E5E8ED';
+
+        // Send Google Analytics - Clear Script
+        gtag('event', 'RunScript', {
+              'event_category' : 'SmartScriptTestPage',
+              'event_label' : 'ClearScript'
+            });
+      };
+
+      function success() {
+        if (isValidHttpUrl(document.getElementById("input_url").value)) {
+          document.getElementById('error-msg').style.display = 'none';
+          document.getElementById('input_url').style.borderColor = '#E5E8ED';
+        } else {
+          document.getElementById('error-msg').style.display = 'block';
+          document.getElementById('input_url').style.borderColor = 'red';
+        }
+        if (!isValidHttpUrl(document.getElementById("input_url").value)) {
+          document.getElementById('error-msg').style.display = 'block';
+          document.getElementById('input_url').style.borderColor = 'red';
+        } else {
+          document.getElementById('error-msg').style.display = 'none';
+          document.getElementById('input_url').style.borderColor = '#E5E8ED';
+        }
+        if ((document.getElementById("input_url").value === "" || document.getElementById("input_code_for_run").value === "") || !isValidHttpUrl(document.getElementById("input_url").value)) {
+          document.getElementById('run-code-btn').disabled = true;
+        } else {
+          document.getElementById('run-code-btn').disabled = false;
+        }
+        if (document.getElementById("input_code_for_run").value === "") {
+          document.getElementById('clear-btn').disabled = true;
+        } else {
+          document.getElementById('clear-btn').disabled = false;
+        }
+        document.getElementById('error-code').style.display = 'none';
+        document.getElementById('input_code_for_run').style.borderColor = '#E5E8ED';
+      }
+
+      function isValidHttpUrl(string) {
+        let url;
+        try {
+          url = new URL(string);
+        } catch (_) {
+          return false;
+        }
+        return url.protocol === "http:" || url.protocol === "https:";
+      }
+      
+    </script>
+  </body>
+  </body>
+</html>

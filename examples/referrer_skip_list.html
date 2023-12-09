@@ -1,0 +1,126 @@
+<!-- This example will demonstare how the script will skip and exit if the HTTP referrer contains a string in the referrerSkipList -->
+<!-- Calling URL: https://appsflyersdk.github.io/af-onelink-smart-script/examples/skip_list.html?incmp=gogo&inmedia=email -->
+<!-- Expected OneLink URL: *** Script will return null *** -->
+<!DOCTYPE html>
+<html>
+<head>
+  <!-- import the webpage's stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="themes/prism.css"
+  />
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RJJXZ6Q5BJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-RJJXZ6Q5BJ');
+  </script>
+</head>
+<body>
+  <div class="row">
+    <div class="column">
+      <img src="../images/appsflyerlogo.png" alt="AppsFlyer logo">
+    </div>
+    <div class="column" style="text-align:right;">
+      <img src="../images/onelinklogo.png" alt="OneLink logo">
+    </div>
+  </div>
+
+  <h1 class="primary-heading">
+    OneLink Smart Script V2
+  </h1>
+  <h2 class="secondary-heading">
+    Referrer Skip List Demo
+  </h2>
+    
+  <div class="url-container">
+    <div class="input_url-container">
+      <h2>Input URL</h2>
+      <h3>To edit: make changes to the input URL in the address bar and reload the page.
+        Changes you have made to the script below will be lost after reload.
+      </h3>
+      <textarea id="input_url" class="present_url" readonly>
+        No input URL
+      </textarea>
+    </div>
+    <div>
+      <pre><code class="language-js">
+        //Initializing Smart Script arguments
+        var oneLinkURL = "https://engmntqa.onelink.me/LtRd/";
+        // If a media source key is NOT FOUND on the link and NO default value is found, the script will return a null string 
+        var mediaSource = {keys: ["inmedia"], defaultValue: "my_media_default_source"};
+        var campaign = {keys: ["incmp"]};
+        var referrerSkipList = ["facebook"];
+
+        //Function is embedded on the window object in a global parameter called window.AF_SMART_SCRIPT.
+        //Onelink URL is generated
+        var result = window.AF_SMART_SCRIPT.generateOneLinkURL({
+          oneLinkURL: oneLinkURL,
+          afParameters:{
+            mediaSource: mediaSource,
+            campaign: campaign,
+          },
+          referrerSkipList: referrerSkipList
+        })
+      </code></pre>
+    </div>
+    <div class="output_url-container">
+      <h2>Output URL</h2>
+      <textarea id="output_url" class="present_url">
+        No output from script
+      </textarea>
+    </div>
+  </div>
+  <div class="stores-wrapper">
+    <a id="ios_link" href="https://apps.apple.com/us/app/my-device-id-by-appsflyer/id1192323960">
+        <img class="appstore-image" src="../images/app_store.png" alt="app store link" >
+    </a>
+    
+    <a id="andrd_link" class="appstore-image" href="https://play.google.com/store/apps/details?id=com.appsflyer.android.deviceid">
+        <img src="../images/play_store.png" alt="play store link">
+    </a>
+  </div>
+  <!-- Force this page HTTP referrer for testing purposes] -->
+  <script type="text/javascript" >
+  Object.defineProperty(document, "referrer", {get : function(){ return "came from facebook.il"; }});
+  </script>
+
+  <script type="text/javascript" src="https://onelinksmartscript.appsflyer.com/onelink-smart-script-latest.js"></script>
+  <script type="text/javascript">
+    window.onload = function () {
+      document.getElementById('input_url').innerHTML = window.location.href;
+
+      //Initializing Smart Script arguments
+      var oneLinkURL = "https://engmntqa.onelink.me/LtRd/";
+      var mediaSource = {keys: ["inmedia"]};
+      var campaign = {keys: ["incmp"]};
+      var referrerSkipList = ["facebook"];
+
+      //Function is embedded on the window object in a global parameter called window.AF_SMART_SCRIPT.
+      //Onelink URL is generated
+      var result = window.AF_SMART_SCRIPT.generateOneLinkURL({
+        oneLinkURL: oneLinkURL,
+        afParameters:{
+          mediaSource: mediaSource,
+          campaign: campaign,
+        },
+        referrerSkipList: referrerSkipList
+      })  
+      
+      var result_url = result.clickURL;
+      if (result_url) {
+            document.getElementById('andrd_link').setAttribute('href', result_url);
+            document.getElementById('ios_link').setAttribute('href', result_url);
+            document.getElementById('output_url').innerHTML = result_url;
+      }
+
+    };
+  </script>
+  <script src="scripts/prism.js"></script>
+</body>
+
+</body>
+</html>
+ 
