@@ -16,29 +16,23 @@ const directoryPath = './examples';
 
                 const [inputUrl, expectedOutputUrl] = await getUrlsFromCommentsArray(filePath);
 
-                console.log("inputUrl ", inputUrl);
-
                 let paramsString = inputUrl.split('?')[1];
                 const paramsObject = new URLSearchParams(paramsString);
-                // console.log(paramsObject);
-                // if (!paramsObject) {
-                //     throw "No params in url";
-                // }
 
-                console.log("paramsObject ", paramsObject.toString());
-
-                const initialScript = getInitialScriptFromHtmlFile(filePath);
+                const initialScript = await getInitialScriptFromHtmlFile(filePath);
 
                 const url = `https://check-smartscript-page.glitch.me/?initialSmartScript=${initialScript}&ExpectedOutputUrl=${expectedOutputUrl}&${paramsObject.toString()}`; // Replace with your actual URL and parameters
 
 
             } catch (error) {
-                console.log(`Error processing file ${htmlFile}: ${error}`);
+                console.log(`Error ${htmlFile}: ${error}`);
             }
         }));
+
     } catch (error) {
         console.error('Error reading directory:', error);
     }
+
 })();
 
 // (async () => {
