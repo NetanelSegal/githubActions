@@ -4,36 +4,45 @@ const fs = require('fs').promises;
 const get3CommentLinesFromHtmlFile = async (filePath) => {
     try {
         const data = await fs.readFile(filePath, 'utf8');
-        const linesToExtract = data.split('\n').slice(0, 3);
-
-        return linesToExtract;
+        return data.split('\n').slice(0, 3);
     } catch (error) {
         console.error('Error reading file:', error);
         throw error; // Re-throw the
     }
 }
 
-
-
-const getUrlsFromComments = (commentsArr) => {
-
-    console.log(commentsArr);
-}
-
-
-
-exports.getUrlsFromFile = async (filePath) => {
+exports.getUrlsFromCommentsArray = async (filePath) => {
     try {
         const commentsArr = await get3CommentLinesFromHtmlFile(filePath)
-        const slicedArray = commentsArr.slice(0 , 3);
-        const stringWithUrls = slicedArray.join(', ');
+        const stringWithUrls = commentsArr.join(', ');
         const urlRegex = /(https?:\/\/[^\s]+)/g;
+
         const urls = stringWithUrls.match(urlRegex);
-        
-     
-        
+        if (!urls) {
+            throw `No urls commented in file: ${filePath}`;
+        }
+
         return urls;
     } catch (error) {
-        console.log(error);
+        throw error;
     }
 }
+
+exports.getInitialScriptFromHtmlFile = async (filePath) => {
+    try {
+        const htmlContent = await fs.readFile(filePath, 'utf-8');
+        // Using a regular expression to match the content of the textarea
+        const match = htmlContent.match(/<textarea id="input_code_for_run"[\s\S]*?>([\s\S]*?)<\/textarea>/);
+
+        if (match && match[1]) {
+            const scriptContent = match[1].trim(); // Trim to remove leading/trailing whitespaces
+            return scriptContent;
+        } else {
+            console.error(`Textarea not found in the HTML file: ${filePath}`);
+            return null;
+        }
+    } catch (error) {
+        console.error(`Error reading HTML file:`, error);
+        return null;
+    }
+};
