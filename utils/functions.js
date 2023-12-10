@@ -16,14 +16,23 @@ const get3CommentLinesFromHtmlFile = async (filePath) => {
 
 
 const getUrlsFromComments = (commentsArr) => {
+
     console.log(commentsArr);
 }
+
 
 
 exports.getUrlsFromFile = async (filePath) => {
     try {
         const commentsArr = await get3CommentLinesFromHtmlFile(filePath)
-        console.log(commentsArr);
+        const slicedArray = commentsArr.slice(0 , 3);
+        const stringWithUrls = slicedArray.join(', ');
+        const urlRegex = /(https?:\/\/[^\s]+)/g;
+        const urls = stringWithUrls.match(urlRegex);
+        
+     
+        
+        return urls;
     } catch (error) {
         console.log(error);
     }
