@@ -21,8 +21,7 @@ const directoryPath = './examples';
 
                 const initialScript = await getInitialScriptFromHtmlFile(filePath);
 
-                const url = `https://check-smartscript-page.glitch.me/?initialSmartScript=${initialScript}&ExpectedOutputUrl=${expectedOutputUrl}&${paramsObject.toString()}`; // Replace with your actual URL and parameters
-
+                const url = `https://check-smartscript-page.glitch.me/?${new URLSearchParams({ initialScript }).toString()}&expectedOutputUrl=${expectedOutputUrl}&${paramsObject.toString()}`; // Replace with your actual URL and parameters
 
             } catch (error) {
                 console.log(`Error ${htmlFile}: ${error}`);
