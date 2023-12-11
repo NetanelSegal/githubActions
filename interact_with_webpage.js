@@ -2,7 +2,6 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path');
 const { getUrlsFromCommentsArray, getInitialScriptFromHtmlFile } = require("./utils/functions");
-const { url } = require('inspector');
 
 const directoryPath = './examples';
 
