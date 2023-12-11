@@ -1,15 +1,16 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 const path = require('path');
-const { getUrlsFromCommentsArray, getInitialScriptFromHtmlFile } = require("./utils/functions")
+const { getUrlsFromCommentsArray, getInitialScriptFromHtmlFile } = require("./utils/functions");
+const { url } = require('inspector');
 
 const directoryPath = './examples';
 
-(async () => {
+const getUrlsForCheckingFromFiles = async (directoryPath) => {
+    let urls = []
     try {
         const files = await fs.readdir(directoryPath);
         const htmlFiles = files.filter(file => path.extname(file).toLowerCase() === '.html');
-
         await Promise.all(htmlFiles.map(async (htmlFile) => {
             try {
                 const filePath = path.join(__dirname, 'examples', htmlFile);
@@ -21,18 +22,36 @@ const directoryPath = './examples';
 
                 const initialScript = await getInitialScriptFromHtmlFile(filePath);
 
-                const url = `https://check-smartscript-page.glitch.me/?${new URLSearchParams({ initialScript }).toString()}&expectedOutputUrl=${expectedOutputUrl}&${paramsObject.toString()}`; // Replace with your actual URL and parameters
+                const url = await `https://check-smartscript-page.glitch.me?${new URLSearchParams({
+                    initialScript: encodeURIComponent(initialScript),
+                    expectedOutputUrl: encodeURIComponent(expectedOutputUrl),
+                }) + "&" + paramsObject}`;
 
+                if (url) {
+                    urls.push(url)
+                }
             } catch (error) {
-                console.log(`Error ${htmlFile}: ${error}`);
+                console.log(`Error ${htmlFile}: ${error} `);
             }
         }));
-
     } catch (error) {
         console.error('Error reading directory:', error);
     }
+    return urls
+}
 
-})();
+(async () => {
+    const urls = await getUrlsForCheckingFromFiles(directoryPath)
+})()
+
+
+const checkResultForURL = async (url, browser) => {
+    const page = await browser.newPage();
+
+    await page.goto(url);
+    const result = await page.$eval('#smartscript-result', (element) => element.textContent);
+    return result
+}
 
 // (async () => {
 //     const browser = await puppeteer.launch({ headless: "new" });
