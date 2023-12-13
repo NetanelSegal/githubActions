@@ -33,6 +33,7 @@ const getUrlsForCheckingFromFiles = async (directoryPath) => {
                     await checkResultForURL(htmlFile, url, browser)
                 }
             } catch (error) {
+                
                 console.log(`Error ${htmlFile}: ${error} `);
             }
         }));
