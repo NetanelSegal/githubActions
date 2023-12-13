@@ -24,7 +24,7 @@ const getUrlsForCheckingFromFiles = async (directoryPath) => {
 
                 const initialScript = await getInitialScriptFromHtmlFile(filePath);
 
-                const url = `http://127.0.0.1:5500?${new URLSearchParams({
+                const url = `https://check-smartscript-page.glitch.me?${new URLSearchParams({
                     initialScript: encodeURIComponent(initialScript),
                     expectedOutputUrl: encodeURIComponent(expectedOutputUrl),
                 }) + "&" + paramsObject}`;
