@@ -44,7 +44,7 @@ const getUrlsForCheckingFromFiles = async (directoryPath) => {
 }
 
 (async () => {
-    const urls = await getUrlsForCheckingFromFiles(directoryPath);
+    await getUrlsForCheckingFromFiles(directoryPath);
 
 })()
 
@@ -57,16 +57,19 @@ const checkResultForURL = async (htmlFile, url, browser) => {
             waitUntil: "networkidle2",
         })
 
-        const result = await page.evaluate(() => document.getElementById("smartscript-result").textContent);
-        if (result == "false") {
-            console.log("result: " + result);
+        const result = await page.evaluate(() => {
+            const smartscriptResult = document.getElementById("smartscript-result").textContent
+            return smartscriptResult
+        });
 
-            console.log("htmlFile: " + htmlFile);
-            console.log("url: " + url);
-            console.log("************************************");
+        if (result == "false") {
+            throw await page.evaluate(() => window.smartscriptResultData);
         }
+        console.log(result);
 
     } catch (error) {
-        console.error("Error: " + error);
+        console.error("Error: ", error);
+        console.error("htmlFile: ", htmlFile);
+        process.exit(1)
     }
 }

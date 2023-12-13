@@ -6,8 +6,7 @@ const get3CommentLinesFromHtmlFile = async (filePath) => {
         const data = await fs.readFile(filePath, 'utf8');
         return data.split('\n').slice(0, 3);
     } catch (error) {
-        console.error('Error reading file:', error);
-        return;
+        throw ('Error reading file:', error);
     }
 }
 
@@ -19,16 +18,12 @@ exports.getUrlsFromCommentsArray = async (filePath) => {
 
         const urls = stringWithUrls.match(urlRegex);
         if (!urls) {
-            // console.error(`No urls commented in file: ${filePath}`);
             throw `No urls commented in file`
-            return;
         }
 
         return urls;
     } catch (error) {
         throw error;
-        console.error(error);
-        return;
     }
 }
 
@@ -42,13 +37,9 @@ exports.getInitialScriptFromHtmlFile = async (filePath) => {
             const scriptContent = match[1].trim(); // Trim to remove leading/trailing whitespaces
             return scriptContent;
         } else {
-            // console.error(`Textarea not found in the HTML file: ${filePath}`);
             throw `Textarea not found in the HTML file`;
-            // return null;
         }
     } catch (error) {
         throw error;
-        // console.error(`Error reading HTML file:`, error);
-        // return null;
     }
 };
