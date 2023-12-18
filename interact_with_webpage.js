@@ -61,8 +61,7 @@ const checkResultForURL = async (htmlFile, url, browser) => {
         console.log("File " + htmlFile + " passed");
 
     } catch (error) {
-        console.error("Error: ", error);
-        console.error("htmlFile: ", htmlFile);
+        console.error("Error: ", { error, htmlFile });
         process.exit(1)
     }
 }
