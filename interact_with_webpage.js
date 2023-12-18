@@ -5,8 +5,7 @@ const { getUrlsFromCommentsArray, getInitialScriptFromHtmlFile } = require("./ut
 
 const directoryPath = './examples';
 
-const getUrlsForCheckingFromFiles = async (directoryPath) => {
-
+const runTestOnFilesInDir = async (directoryPath) => {
     try {
         const files = await fs.readdir(directoryPath);
         const htmlFiles = files.filter(file => path.extname(file).toLowerCase() === '.html');
@@ -33,8 +32,7 @@ const getUrlsForCheckingFromFiles = async (directoryPath) => {
                     await checkResultForURL(htmlFile, url, browser)
                 }
             } catch (error) {
-                
-                console.log(`Error ${htmlFile}: ${error} `);
+                console.log(`Skiped file ${htmlFile} - ${error} `);
             }
         }));
 
@@ -43,12 +41,6 @@ const getUrlsForCheckingFromFiles = async (directoryPath) => {
         console.error('Error reading directory:', error);
     }
 }
-
-(async () => {
-    await getUrlsForCheckingFromFiles(directoryPath);
-
-})()
-
 
 const checkResultForURL = async (htmlFile, url, browser) => {
     try {
@@ -66,7 +58,7 @@ const checkResultForURL = async (htmlFile, url, browser) => {
         if (result == "false") {
             throw await page.evaluate(() => window.smartscriptResultData);
         }
-        console.log(result);
+        console.log("File " + htmlFile + " passed");
 
     } catch (error) {
         console.error("Error: ", error);
@@ -74,3 +66,7 @@ const checkResultForURL = async (htmlFile, url, browser) => {
         process.exit(1)
     }
 }
+
+(async () => {
+    await runTestOnFilesInDir(directoryPath);
+})()
